@@ -11,6 +11,7 @@ import { renderGalleryPage } from './pages/GalleryPage.js';
 import { renderSponsorsPage } from './pages/SponsorsPage.js';
 import { renderTeamPage } from './pages/TeamPage.js';
 import { renderContactPage } from './pages/ContactPage.js';
+import { renderRegistrationPage, initRegistrationPage } from './pages/RegistrationPage.js';
 import { events } from './data/events.js';
 import { initGraphics } from './graphics.js';
 
@@ -771,10 +772,15 @@ function renderPage(routeName) {
     sponsors: renderSponsorsPage,
     team: renderTeamPage,
     contact: renderContactPage,
+    register: renderRegistrationPage,
   };
 
   const renderFn = pages[routeName] || pages.home;
   container.innerHTML = renderFn();
+
+  if (routeName === 'register') {
+    initRegistrationPage();
+  }
 
   if (routeName === 'home') {
     container.style.paddingTop = '0';

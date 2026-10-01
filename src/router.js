@@ -13,6 +13,7 @@ export class Router {
       '/sponsors': 'sponsors',
       '/team': 'team',
       '/contact': 'contact',
+      '/register': 'register',
     };
 
     window.addEventListener('hashchange', () => this.handleRoute());

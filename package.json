@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server.js --dev",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "npm run build && node server.js",
+    "start": "node server.js",
     "check:colors": "node scripts/check-colors.cjs"
   },
   "dependencies": {
