@@ -108,10 +108,10 @@ h3 { font: 600 1.15rem/1.2 var(--hd); }
 .nav.hide { opacity: 0; transform: translateY(-160%); pointer-events: none; }
 .mark { font: 800 1.1rem var(--hd); text-decoration: none; letter-spacing: .1em; }
 .mark img { height: 34px; display: block; }
-.nav nav { display: flex; align-items: center; gap: 1.7rem; font: .78rem var(--mono); letter-spacing: .14em; text-transform: uppercase; }
-.nav nav > a:not(.reg) { text-decoration: none; color: #ddd; padding: .3rem 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
-.nav nav a.active { border-color: #fff; color: #fff; }
-.nav nav .sep { border-left: 1px solid var(--line); padding-left: 1.7rem; margin-left: -.4rem; }
+.nav .nav-links { display: flex; align-items: center; gap: 1.7rem; font: .78rem var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+.nav .nav-links > a:not(.reg) { text-decoration: none; color: #ddd; padding: .3rem 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
+.nav .nav-links a.active { border-color: #fff; color: #fff; }
+.nav .nav-links .sep { border-left: 1px solid var(--line); padding-left: 1.7rem; margin-left: -.4rem; }
 .reg { background: #fff; color: #000; padding: .8rem 1rem; text-decoration: none; font-weight: 600; border-radius: 3px; transition: background .2s, color .2s; }
 .reg:hover { background: var(--red); color: #fff; }
 /* Burger — animated 3-line to X */
@@ -643,7 +643,7 @@ input:focus, textarea:focus { border-color: rgba(255,255,255,.5); outline: none;
   .nav-socials-row a:hover { color: var(--red); background: rgba(255,26,26,.08); }
   .nav-socials-row svg { width: 18px; height: 18px; pointer-events: none; }
   /* hide desktop reg button */
-  .nav nav > a.reg { display: none; }
+  .nav .nav-links > a.reg { display: none; }
   .scroll { display: none; }
   .wbody { padding: 1.5rem 1.4rem; }
   .tools input, .phd input { width: 100%; }
