@@ -1,85 +1,184 @@
-# Cybersecurity OWASP Consortium MANIT Bhopal
+# Cybersecurity OWASP Consortium — MANIT Bhopal
 
-Welcome to the official website repository for the **Cybersecurity OWASP Consortium** at MANIT Bhopal. This platform serves as a hub for our community, showcasing our events, collaborations, team members, and the essence of what we do in the cybersecurity domain.
+<div align="center">
+  <img src="public/logo.png" alt="OWASP MANIT Logo" height="80" />
+  <br/>
+  <strong>Official website of the Cybersecurity OWASP Consortium chapter at MANIT Bhopal.</strong>
+  <br/><br/>
 
-## 🚀 Overview
+  ![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react)
+  ![Vite](https://img.shields.io/badge/Vite-8-646cff?style=flat-square&logo=vite)
+  ![License](https://img.shields.io/badge/License-MIT-red?style=flat-square)
+</div>
 
-The website is a modern, single-page application (SPA) built to be fast, responsive, and visually striking. It features a unique "OS Theme" with a sleek, dark UI, technical grid backgrounds, and a live 3D terminal hero section.
+---
 
-### Key Features
-- **3D Hero Scene**: A custom Three.js visualization featuring tech stacks orbiting a live-rendered terminal sphere.
-- **Smooth Scrolling**: Implemented via Lenis for a premium navigation experience.
-- **GSAP Animations**: Scroll-triggered reveals, staggers, and parallax effects.
-- **Custom SPA Router**: Hash-based routing (`#/about`, `#/events`, etc.) for seamless page transitions without reloads.
-- **Responsive Design**: fully optimized for desktop, tablet, and mobile devices.
+## ✦ Overview
 
-## 🛠️ Technology Stack
+A hacker-themed single-page application showcasing the consortium's events, team, gallery, sponsors, and the **CYBERPULSE** workshop registration system. Built with a pure black/white/red terminal aesthetic — no bloat, no external CSS frameworks.
 
-- **Core**: Vanilla HTML, CSS, JavaScript (ES6 Modules)
-- **3D Engine**: [Three.js](https://threejs.org/)
-- **Animations**: [GSAP](https://gsap.com/) & ScrollTrigger
-- **Scrolling**: [Lenis](https://lenis.studiofreight.com/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
+Live: **[owaspmanit.in](https://owaspmanit.in)** (HashRouter, so all routes use `#/...`)
+
+---
+
+## 🗂 Pages
+
+| Route | Description |
+|-------|-------------|
+| `#/` | Home — hero, stats, programs, mission |
+| `#/about` | About — journey timeline, collaborators |
+| `#/events` | Upcoming & past events |
+| `#/gallery` | Photo gallery grid |
+| `#/sponsors` | Sponsors by tier |
+| `#/team` | Full team with photos & social links |
+| `#/contact` | Contact form |
+| `#/register` | **CYBERPULSE** workshop registration |
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Tool |
+|-------|------|
+| UI Framework | React 19 + JSX |
+| Build | Vite 8 |
+| Routing | React Router v7 (HashRouter) |
+| Styling | Vanilla CSS (design tokens in `styles.css`) |
+| Animation | CSS keyframes + IntersectionObserver |
+| 3D Background | Canvas 2D (custom particle/network) |
+| Fonts | Outfit (headings), JetBrains Mono (labels), Inter (body) |
+
+---
 
 ## 📂 Project Structure
 
-```text
-├── index.html           # Main entry point
-├── package.json         # Dependencies and scripts
-├── vite.config.js       # Vite configuration
-└── src/                 # Source files
-    ├── main.js          # Entry script, initialization
-    ├── router.js        # Custom SPA router logic
-    ├── data/            # Static data (events, team, collaborators)
-    ├── pages/           # Page rendering logic (Home, About, Events, etc.)
-    ├── styles/          # Modular CSS files
-    ├── three/           # Three.js scene definitions (HeroScene)
-    └── utils/           # Helper functions
+```
+cybersecurity-owasp-consortium/
+├── public/
+│   ├── logo.png            # Site logo
+│   ├── team/               # Team member photos (copied from src/assets/team/)
+│   └── fonts/, icons/
+├── src/
+│   ├── App.jsx             # All pages + shared components (single-file SPA)
+│   ├── data.js             # ← ALL content lives here (team, events, sponsors…)
+│   ├── cyberpulse.config.js # ← CYBERPULSE event config (fees, UPI, FAQ…)
+│   ├── styles.css          # Global design tokens + shared component styles
+│   ├── main.jsx            # React entry point
+│   ├── pages/
+│   │   └── Register/       # CYBERPULSE registration page
+│   │       ├── index.jsx
+│   │       ├── Hero.jsx
+│   │       ├── RegisterOptions.jsx
+│   │       ├── ManitForm.jsx
+│   │       ├── OutsideForm.jsx
+│   │       ├── PaymentBlock.jsx
+│   │       ├── SuccessCard.jsx
+│   │       ├── Modal.jsx
+│   │       ├── Faq.jsx
+│   │       └── register.css
+│   ├── components/
+│   │   └── Slider.jsx      # Scroll-snap carousel
+│   └── assets/
+│       └── team/           # Source team photos (use New_images/ for latest)
+├── index.html
+├── vite.config.js
+└── package.json
 ```
 
-## 💻 Local Development Setup
+---
 
-To run this project locally, you will need [Node.js](https://nodejs.org/) installed on your machine.
+## ⚡ Local Development
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd cybersecurity-owasp-consortium
-   ```
+```bash
+# 1. Install dependencies
+npm install
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# 2. Start dev server (hot-reload)
+npm run dev
+# → http://localhost:5173
 
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-   This will start Vite on `http://localhost:3000` (or another available port). The browser will open automatically.
+# 3. Build for production
+npm run build
 
-## 🚢 Deployment
+# 4. Preview production build
+npm run preview
+```
 
-This project is optimized for deployment on platforms like [Vercel](https://vercel.com/), [Netlify](https://netlify.com/), or GitHub Pages.
+---
 
-### Deploying to Vercel
-1. Push your code to a GitHub repository.
-2. Log in to Vercel and click **Add New Project**.
-3. Import your repository.
-4. Vercel will automatically detect **Vite**.
-5. Keep the default settings (Build command: `npm run build`, Output directory: `dist`).
-6. Click **Deploy**.
+## ✏️ How to Update Content
+
+Everything is in **two files** — no hunting through components.
+
+### Site content (`src/data.js`)
+```js
+// Update team members:
+export const team = {
+  'Faculty Advisors': [
+    { name: 'Dr. Name', role: 'Faculty Advisor', img: 'Name.jpg', linkedin: 'https://...', github: '#' },
+  ],
+  ...
+}
+
+// Update social links:
+export const SOCIALS = [
+  ['instagram', 'https://instagram.com/owasp.manit'],
+  ...
+]
+```
+
+### CYBERPULSE workshop (`src/cyberpulse.config.js`)
+```js
+export const CYBERPULSE = {
+  venue: 'CSE Seminar Hall, MANIT Bhopal', // fill in
+  payment: {
+    upiId: 'yourname@upi',                 // fill in
+    qrImage: '/qr code.jpeg',
+  },
+  registration: {
+    endpoint: 'https://your-formspree-url', // fill in
+  },
+  links: {
+    whatsapp: 'https://chat.whatsapp.com/...', // fill in
+  },
+}
+```
+
+### Adding team photos
+1. Put the photo in `public/team/YourName.jpg`
+2. Set `img: 'YourName.jpg'` in `src/data.js`
+
+---
+
+## 🚀 Deployment
+
+### Vercel (recommended)
+1. Push to GitHub
+2. Import repo into [Vercel](https://vercel.com)
+3. Build command: `npm run build`
+4. Output directory: `dist`
+5. Deploy — done ✓
+
+### GitHub Pages
+```bash
+npm run build
+# then push dist/ to gh-pages branch
+```
+
+> **Note:** This is a HashRouter SPA — all routes use `#/` so no server-side rewrite config is needed.
+
+---
 
 ## 🤝 Contributing
 
-We welcome contributions! If you have ideas for improvements, new features, or bug fixes:
+1. Fork the repository
+2. Create a branch: `git checkout -b feature/my-feature`
+3. Commit: `git commit -m 'Add my feature'`
+4. Push: `git push origin feature/my-feature`
+5. Open a Pull Request
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT © Cybersecurity OWASP Consortium, MANIT Bhopal

@@ -14,6 +14,7 @@ import { renderContactPage } from './pages/ContactPage.js';
 import { renderRegistrationPage, initRegistrationPage } from './pages/RegistrationPage.js';
 import { events } from './data/events.js';
 import { initGraphics } from './graphics.js';
+import { mountNetworkBg3D } from './network-bg-3d.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,6 +23,7 @@ let secureScene = null;
 let lenis = null;
 let cdInterval = null;
 let eventModalListenersAdded = false;
+let globalNetBg = null; // full-page 3D network background
 
 
 
@@ -960,7 +962,16 @@ async function init() {
   }, true);
 
   // Initialize new 3D graphics & cursor
-  initGraphics();
+  initGraphics(); // no-op stub, kept for compatibility
+
+  // Mount full-page 3D network background (white on #050505, no color)
+  if (!globalNetBg) {
+    globalNetBg = mountNetworkBg3D(null, {
+      // quietEl will be populated dynamically inside the animation loop
+      // when the home page title is available
+      quietEl: null
+    });
+  }
 }
 
 // Start
