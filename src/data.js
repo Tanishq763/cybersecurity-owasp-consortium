@@ -5,7 +5,7 @@
 
 export const EMAIL = 'owasp@manit.ac.in'
 export const FORM_ENDPOINT = ''        // Formspree / Web3Forms POST URL
-export const REG_URL = '#/register'    // Registration page route
+export const REG_URL = '/register'    // Registration page route
 
 export const SOCIALS = [
   ['instagram', 'https://www.instagram.com/owasp.manit/'],
