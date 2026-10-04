@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import Slider from './components/Slider';
 import { Routes, Route, NavLink, Link, useLocation, Navigate } from 'react-router-dom'
-import { EMAIL, FORM_ENDPOINT, REG_URL, SOCIALS, events, past, stats, programs, journey, collabs, team, members, sponsors, gallery } from './data.js'
+import { EMAIL, FORM_ENDPOINT, SOCIALS, events, past, stats, programs, journey, collabs, team, gallery } from './data.js'
 import { mountNetworkBg3D } from './network-bg-3d.js'
 
 // Lazy-load the heavy registration page so it doesn't bloat initial bundle
@@ -44,7 +44,10 @@ function Preloader({ onDone }) {
 
 /* ---------- shared pieces ---------- */
 const Img = ({ src, label = 'Image', cls = '' }) => {
-  const p = src ? (src.startsWith('http') || src.startsWith('data:') ? src : import.meta.env.BASE_URL + src) : '';
+  let p = src || '';
+  if (p && !p.startsWith('http') && !p.startsWith('data:') && !p.startsWith(import.meta.env.BASE_URL)) {
+    p = (import.meta.env.BASE_URL || '') + (p.startsWith('/') ? p.slice(1) : p);
+  }
   return <div className={`ph ${cls}`}><span>{label}</span>{p && <img src={p} alt="" loading="lazy" onError={e => e.currentTarget.remove()} />}</div>
 }
 const Win = ({ file, status, children }) => {
@@ -109,10 +112,7 @@ function useCountdown(date) {
   const d = Math.max(0, new Date(date) - now)
   return [['Days', Math.floor(d / 864e5)], ['Hours', Math.floor(d / 36e5) % 24], ['Mins', Math.floor(d / 6e4) % 60], ['Secs', Math.floor(d / 1e3) % 60]]
 }
-const EventCard = ({ e, i, open }) => <article className="ecard">
-  <div className="row"><small>ENTRY_{pad(i + 1)}</small><span className="tag">{e.tag.toUpperCase()}</span><span className="up">● UPCOMING</span></div>
-  <small className="mono">{fmt(e.date)}</small><h3>{e.title}</h3><p>{e.desc}</p>
-  <div className="row foot"><small>LOC // {e.place}</small><button onClick={() => open(e)}>REGISTER →</button></div></article>
+
 
 /* ---------- navigation ---------- */
 const LINKS = [
@@ -164,7 +164,7 @@ function Nav() {
   return (
     <header className={`nav ${home && y < 80 ? 'hide' : ''}`}>
       <Link to="/" className="mark" aria-label="Home">
-        <img src="logo.png" alt="OWASP MANIT" />
+        CYBERPULSE
       </Link>
 
       {/* Desktop nav links */}
@@ -411,7 +411,7 @@ function Home() {
       <div className="head"><h2 className="t">Events &amp;<br />Experiences</h2><div><p>Explore workshops, CTFs, technical sessions, hackathons and more.</p><Link className="btn" to="/events">VIEW ALL EVENTS →</Link></div></div>
       <div className="feat"><Img src="event.jpg" label="Featured event (public/event.jpg)" cls="bgimg" /><div className="fin">
         <span className="tag">{f.tag.toUpperCase()}</span> <span className="tag dim">[ FEATURED ]</span><small className="mono d">{fmt(f.date)}</small><h3 className="t sm">{f.title}</h3><p>{f.desc}</p><small>LOC // {f.place}</small><br />
-        <button className="btn" onClick={() => setSel(f)}>KNOW MORE →</button></div></div>
+        <Link className="btn" to="/register">KNOW MORE →</Link></div></div>
       <Slider autoplay={4000} className="events-slider">{events.slice(1).map((e, i) => <EvCard key={i} e={e} i={i} open={setSel} />)}</Slider></Win>
     <Win file="network.bat" status={<><span className="pulse-dot">●</span> CONNECTED</>}>
       <div className="center"><Eye>04 — CONNECTED BY SECURITY</Eye><h2 className="t">Collaborations</h2><p>Working together for a stronger cybersecurity ecosystem.</p></div>
@@ -440,7 +440,13 @@ function EvCard({ e, i, open }) {
     <div className="dblock"><b>{String(dt.getDate()).padStart(2, '0')}</b><small>{dt.toLocaleString('en-GB', { month: 'short' }).toUpperCase()}</small></div>
     <div className="ebody"><div className="row"><span className="tag">{e.tag.toUpperCase()}</span><span className={`badge ${s.toLowerCase()}`}>● {s}</span></div>
       <h3>{e.title}</h3><p>{e.desc || 'Details coming soon.'}</p>
-      <div className="row foot"><small>LOC // {e.place || 'Auditorium, MANIT'}</small><button onClick={() => open(e)}>{s === 'COMPLETED' ? 'VIEW DETAILS' : 'REGISTER'} →</button></div></div></article></Rv>
+      <div className="row foot"><small>LOC // {e.place || 'Auditorium, MANIT'}</small>
+        {e.title.toLowerCase().includes('cyberpulse') && s !== 'COMPLETED' ? (
+          <Link to="/register">REGISTER →</Link>
+        ) : (
+          <button onClick={() => open(e)}>{s === 'COMPLETED' ? 'VIEW DETAILS' : 'REGISTER'} →</button>
+        )}
+      </div></div></article></Rv>
 }
 function Events() {
   const [sel, setSel] = useState(null), [f, setF] = useState('All'), [q, setQ] = useState(''), [v, setV] = useState('GRID'), [asc, setAsc] = useState(true)
@@ -550,9 +556,7 @@ function Person({ m, big, i }) {
       <div className="plinks">{m.linkedin && m.linkedin !== '#' && <a href={m.linkedin} target="_blank" rel="noreferrer" aria-label={`${m.name} LinkedIn`}><Ic n="linkedin" /></a>}{m.github && m.github !== '#' && <a href={m.github} target="_blank" rel="noreferrer" aria-label={`${m.name} GitHub`}><Ic n="github" /></a>}</div></div></Tilt></Rv>
 }
 function Team() {
-  const [q, setQ] = useState(''), [d, setD] = useState('All'), total = Object.values(team).flat().length
-  const depts = ['All', ...new Set(members.map(m => m.dept).filter(Boolean))]
-  const shown = members.filter(m => (d === 'All' || m.dept === d) && m.name.toLowerCase().includes(q.toLowerCase()))
+  const total = Object.values(team).flat().length
   return <main className="page"><Head eye="TEAM" a="The humans" b="behind the mission."><div className="mini row3">{[[total, 'TOTAL MEMBERS'], [team['Faculty Advisors'].length, 'FACULTY'], [team['Core Team'].length, 'CORE TEAM']].map(([a, b]) => <div key={b}><b><Count to={a} /></b><small>{b}</small></div>)}</div></Head>
     {Object.entries(team).map(([g, l]) => <section key={g} className="sec"><div className="phd"><h2 className="mono sm">// {g.toUpperCase()}</h2><small>{l.length}</small></div>
       <div className={`pgrid ${g === 'Faculty Advisors' ? 'big' : ''}`}>{l.map((m, i) => <Person key={i} m={m} i={i} big={g === 'Faculty Advisors'} />)}</div></section>)}

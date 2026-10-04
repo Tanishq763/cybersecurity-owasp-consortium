@@ -94,8 +94,8 @@ export const team = {
     { name: 'Sanjana Kabir',          role: 'Core Member',    img: 'Sanjana-Kabir.jpg',     linkedin: '#', github: '#' },
     { name: 'Shivansh Kumar Sahu',    role: 'Core Member',    img: 'Shivansh-Kumar-Sahu.jpg',linkedin: '#', github: '#' },
     { name: 'Ashu Debnath',           role: 'Core Member',    img: 'Ashu-Debnath.jpg',      linkedin: '#', github: '#' },
-    { name: 'Mudit Kalya',            role: 'Core Member',    img: 'Mudir-Kalya.jpg',       linkedin: '#', github: '#' },
-    { name: 'Pranjali Tiwari',        role: 'Core Member',    img: 'pranjali-tiwari.jpg.jpg',linkedin: '#', github: '#' },
+    { name: 'Mudit Kalya',            role: 'Core Member',    img: 'Mudit-Kalya.jpg',       linkedin: '#', github: '#' },
+    { name: 'Pranjali Tiwari',        role: 'Core Member',    img: 'Pranjali-Tiwari.jpg',   linkedin: '#', github: '#' },
     { name: 'Prabhat Singh Raj',      role: 'Core Member',    img: 'Prabhat-Singh-Raj.jpg', linkedin: '#', github: '#' },
   ],
 }

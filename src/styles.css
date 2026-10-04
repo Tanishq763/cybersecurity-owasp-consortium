@@ -98,20 +98,31 @@ h3 { font: 600 1.15rem/1.2 var(--hd); }
 
 /* ===== NAV ===== */
 .nav {
-  position: fixed; top: 1.2rem; left: 50%; translate: -50% 0; z-index: 50;
-  width: min(1400px,92vw); display: flex; align-items: center; justify-content: space-between;
-  padding: .5rem .6rem .5rem 1.4rem;
-  border: 1px solid var(--line); border-radius: 999px;
-  background: rgba(8,8,8,.88); backdrop-filter: blur(10px);
+  position: fixed; top: 1.5rem; left: 50%; translate: -50% 0; z-index: 50;
+  width: min(1200px, 94vw); display: flex; align-items: center; justify-content: space-between;
+  padding: .6rem .8rem .6rem 1.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 999px;
+  background: rgba(10, 12, 16, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
   transition: opacity .4s, transform .4s;
 }
 .nav.hide { opacity: 0; transform: translateY(-160%); pointer-events: none; }
-.mark { font: 800 1.1rem var(--hd); text-decoration: none; letter-spacing: .1em; }
-.mark img { height: 34px; display: block; }
+.mark { 
+  font: 900 1.4rem var(--hd); 
+  text-decoration: none; 
+  letter-spacing: .35em; 
+  color: #fff; 
+  display: flex; 
+  align-items: center; 
+  text-shadow: 0 0 10px rgba(255, 26, 26, 0.6), 0 0 20px rgba(0, 212, 255, 0.4);
+  text-transform: uppercase;
+}
 /* Desktop nav-links container */
-.nav-links { display: flex; align-items: center; gap: 1.7rem; font: .78rem var(--mono); letter-spacing: .14em; text-transform: uppercase; }
-.nav-links > a { text-decoration: none; color: #ddd; padding: .3rem 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
-.nav-links > a:not(.reg):hover, .nav-links > a:not(.reg).active { border-bottom-color: #fff; color: #fff; }
+.nav-links { display: flex; align-items: center; gap: 2.2rem; font: .8rem var(--mono); letter-spacing: .15em; text-transform: uppercase; font-weight: 600; }
+.nav-links > a { text-decoration: none; color: #a0a0a0; padding: .5rem 0; position: relative; transition: color .3s ease; }
+.nav-links > a:not(.reg)::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 2px; background: var(--red); transition: width .3s ease, box-shadow .3s ease; border-radius: 2px; }
+.nav-links > a:not(.reg):hover, .nav-links > a:not(.reg).active { color: #fff; }
+.nav-links > a:not(.reg):hover::after, .nav-links > a:not(.reg).active::after { width: 100%; box-shadow: 0 0 10px var(--red); }
 
 /* Mobile nav: hidden by default, shown only when .open */
 .nav nav {
@@ -144,7 +155,16 @@ h3 { font: 600 1.15rem/1.2 var(--hd); }
   color: #fff; border-left-color: var(--red);
   background: rgba(255,26,26,.05);
 }
-.mobile-reg { background: rgba(255,26,26,.12) !important; color: var(--red) !important; border-left-color: var(--red) !important; }
+.mobile-reg { 
+  background: rgba(255,26,26,.12) !important; 
+  color: var(--red) !important; 
+  border-left-color: var(--red) !important;
+  border-radius: 0;
+  margin-left: 0;
+  box-shadow: none;
+  border: none;
+  border-left: 2px solid var(--red) !important;
+}
 
 /* Social icons in mobile menu */
 .nav-links-sep { height: 1px; background: rgba(255,255,255,.08); margin: .35rem 1.5rem; display: none; }
@@ -175,8 +195,22 @@ h3 { font: 600 1.15rem/1.2 var(--hd); }
 .qr-spotlight strong { color: var(--red); }
 
 /* REGISTER button (desktop pill) */
-.reg { background: #fff; color: #000; padding: .65rem 1.1rem; text-decoration: none; font-weight: 700; border-radius: 4px; font-size: .75rem; letter-spacing: .12em; transition: background .2s, color .2s; white-space: nowrap; }
-.reg:hover { background: var(--red); color: #fff; }
+.reg { 
+  background: var(--red); color: #fff !important; 
+  padding: .65rem 1.6rem; text-decoration: none; 
+  font-weight: 800; border-radius: 999px; 
+  font-size: .8rem; letter-spacing: .12em; 
+  transition: all .3s ease; white-space: nowrap;
+  box-shadow: 0 0 15px rgba(255, 26, 26, 0.4);
+  border: 1px solid rgba(255, 26, 26, 0.8);
+  margin-left: .5rem;
+}
+.reg:hover { 
+  background: #fff; color: var(--red) !important; 
+  box-shadow: 0 0 25px rgba(255, 26, 26, 0.7); 
+  border-color: #fff;
+  transform: translateY(-2px);
+}
 
 /* Burger — animated 3-line to X */
 .burger {

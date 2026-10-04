@@ -7,11 +7,11 @@ export const CYBERPULSE = {
   name: 'CYBERPULSE',
   tagline: 'Ethical Hacking & Web Security Workshop',
   hook: "Ever wondered how websites actually get hacked? Now's your chance to find out!",
-  date: '2026-10-10T10:00:00',   // ISO, used by countdown
+  date: '2026-10-10T10:00:00+05:30',   // ISO, used by countdown
   dateLabel: '10 OCTOBER 2026',
   timeLabel: '10 AM – 4 PM',
   reportingTime: '9:30 AM',
-  venue: 'TBA',                   // e.g. "CSE Seminar Hall, MANIT Bhopal"
+  venue: 'Auditorium MANIT',
   mapsLink: 'https://maps.google.com/?q=MANIT+Bhopal',
   seatsLabel: 'TBA',             // e.g. "Limited to 100 seats"
 
@@ -32,7 +32,7 @@ export const CYBERPULSE = {
 
   // ── Registration ────────────────────────────────────────────
   registration: {
-    endpoint: 'https://script.google.com/macros/s/AKfycbwQzDA8q_kXmlAz3mGXJWOcPsMabQ2RNer2qBTCy57p-Wi3ItqO08peCfF4xj0IwwTUKw/exec',
+    endpoint: 'https://script.google.com/macros/s/AKfycbzMko1fNXMNcq6ONEKS0C890D-02h6wDRFMUU33s1V_qQxtqD5ON9Ef51fNTBhZQVYkag/exec',
     allowedManitDomains: [],
     scholarPattern: /^\d{9,12}$/,  // adjust digits as needed
     yearOptions: ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Other'],
@@ -47,8 +47,8 @@ export const CYBERPULSE = {
   // ── Contact ─────────────────────────────────────────────────
   contact: {
     name: 'OWASP MANIT Team',
-    email: 'TBA@manit.ac.in',
-    phone: 'TBA',
+    email: 'owasp.chap.manit@gmail.com',
+    phone: 'Dev Sharma: 7987554704 | Manya Mehta: 9024097786',
   },
 
   // ── Agenda ──────────────────────────────────────────────────
@@ -82,7 +82,7 @@ export const CYBERPULSE = {
     { q: 'What are the Combo/Team rules?', a: 'A Combo registration is for a team of exactly 3 people. Fill in details for all three members. The fee is ₹649 for the whole team.' },
     { q: 'Will I get a certificate?', a: 'Yes! All participants who attend the full session will receive a certificate of participation.' },
     { q: 'What is the refund policy?', a: 'Registration fees are non-refundable once paid.' },
-    { q: 'How do I contact the organisers?', a: 'Email us at TBA@manit.ac.in or reach out via our WhatsApp group.' },
+    { q: 'How do I contact the organisers?', a: 'Email us at owasp.chap.manit@gmail.com or call Dev Sharma (7987554704) / Manya Mehta (9024097786).' },
   ],
 
   // ── Organiser display ────────────────────────────────────────

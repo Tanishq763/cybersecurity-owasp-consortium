@@ -19,6 +19,8 @@ export default function Faq() {
       </div>
       <p className="cp-faq-contact">
         More questions? Email us at <a href={`mailto:${CYBERPULSE.contact.email}`}>{CYBERPULSE.contact.email}</a>
+        <br />
+        Or call us: {CYBERPULSE.contact.phone}
       </p>
     </section>
   );
