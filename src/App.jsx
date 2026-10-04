@@ -1,9 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, Suspense, lazy } from 'react';
 import Slider from './components/Slider';
-import { Routes, Route, NavLink, Link, useLocation } from 'react-router-dom'
+import { Routes, Route, NavLink, Link, useLocation, Navigate } from 'react-router-dom'
 import { EMAIL, FORM_ENDPOINT, REG_URL, SOCIALS, events, past, stats, programs, journey, collabs, team, members, sponsors, gallery } from './data.js'
-import Registration from './pages/Register'
 import { mountNetworkBg3D } from './network-bg-3d.js'
+
+// Lazy-load the heavy registration page so it doesn't bloat initial bundle
+const Registration = lazy(() => import('./pages/Register'))
 
 const fmt = d => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()
 const pad = n => String(n).padStart(3, '0')
@@ -24,8 +26,6 @@ const P = {
   code: <path d="m8 7-5 5 5 5m8-10 5 5-5 5" />,
 }
 const Ic = ({ n }) => <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{P[n]}</svg>
-
-/* ---------- 3D network background removed ---------- */
 
 /* ---------- preloader ---------- */
 const LINES = ['> initializing secure channel', '> verifying integrity ... ok', '> access granted']
@@ -56,7 +56,7 @@ const Win = ({ file, status, children }) => {
   return <section ref={r} className="win"><div className="wbar"><i /><i /><i className="on" /><span>{file}</span><em>{status}</em></div><div className="wbody">{children}</div></section>
 }
 const Eye = ({ children }) => <p className="eye"><u>//</u>{children}</p>
-const Socials = () => <>{SOCIALS.map(([n, u]) => <a key={n} href={u} aria-label={n}><Ic n={n} /></a>)}</>
+const Socials = () => <>{SOCIALS.map(([n, u]) => <a key={n} href={u} target="_blank" rel="noreferrer" aria-label={n}><Ic n={n} /></a>)}</>
 function Typed({ lines }) {
   const [s, setS] = useState({ l: 0, i: 0, d: false })
   useEffect(() => {
@@ -86,6 +86,8 @@ function Count({ to }) {
   }, [end])
   return <>{n}{m[2]}</>
 }
+const status = d => { const n = new Date().setHours(0, 0, 0, 0), x = new Date(d).setHours(0, 0, 0, 0); return x < n ? 'COMPLETED' : x === n ? 'LIVE' : 'UPCOMING' }
+
 function Modal({ e, close }) {
   const r = useRef()
   useEffect(() => {
@@ -96,9 +98,10 @@ function Modal({ e, close }) {
   return <div className="overlay" onClick={close}><div ref={r} className="win modal" role="dialog" aria-modal="true" aria-label={e.title} onClick={x => x.stopPropagation()}>
     <button className="x" aria-label="Close" onClick={close}>✕</button>
     <small className="mono">{e.tag.toUpperCase()} · {fmt(e.date)}</small><h2 className="t sm">{e.title}</h2><p>{e.desc || 'Details coming soon.'}</p>
-    <p className="mono sm">LOC // {e.place || 'MANIT Bhopal'}</p>
+    <p className="mono sm">LOC // {e.place || 'Auditorium, MANIT'}</p>
     {e.schedule && <ul className="sched">{e.schedule.map(s => <li key={s}>{s}</li>)}</ul>}
-    {status(e.date) !== 'COMPLETED' && <a className="btn red" href={REG_URL} onClick={close}>REGISTER →</a>}</div></div>
+    {status(e.date) !== 'COMPLETED' && <Link className="btn red" to="/register" onClick={close}>REGISTER →</Link>}
+  </div></div>
 }
 function useCountdown(date) {
   const [now, setNow] = useState(Date.now())
@@ -111,27 +114,78 @@ const EventCard = ({ e, i, open }) => <article className="ecard">
   <small className="mono">{fmt(e.date)}</small><h3>{e.title}</h3><p>{e.desc}</p>
   <div className="row foot"><small>LOC // {e.place}</small><button onClick={() => open(e)}>REGISTER →</button></div></article>
 
-/* ---------- navigation + footer ---------- */
-const LINKS = [['/', 'Home'], ['/about', 'About'], ['/events', 'Events'], ['/gallery', 'Gallery'], ['/team', 'Team'], ['/contact', 'Contact']]
+/* ---------- navigation ---------- */
+const LINKS = [
+  ['/', 'Home'],
+  ['/about', 'About'],
+  ['/events', 'Events'],
+  ['/gallery', 'Gallery'],
+  ['/team', 'Team'],
+  ['/contact', 'Contact'],
+]
+
 function Nav() {
-  const { pathname } = useLocation(), home = pathname === '/', [y, setY] = useState(0), [open, setOpen] = useState(false)
-  useEffect(() => { const f = () => setY(scrollY); f(); addEventListener('scroll', f); return () => removeEventListener('scroll', f) }, [])
-  useEffect(() => { setOpen(false); document.body.style.overflow = '' }, [pathname])
-  const toggle = () => { const next = !open; setOpen(next); document.body.style.overflow = next ? 'hidden' : '' }
-  return <header className={`nav ${home && y < 80 ? 'hide' : ''}`}>
-    <Link to="/" className="mark" aria-label="Home"><img src="logo.png" alt="OWASP MANIT" /></Link>
-    <button className={`burger ${open ? 'open' : ''}`} aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={toggle}>
-      <span /><span /><span />
-    </button>
-    <nav className={open ? 'open' : ''} aria-hidden={!open}>
+  const { pathname } = useLocation()
+  const home = pathname === '/'
+  const [y, setY] = useState(0)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const f = () => setY(scrollY)
+    f()
+    addEventListener('scroll', f, { passive: true })
+    return () => removeEventListener('scroll', f)
+  }, [])
+
+  // Close menu & restore scroll on route change
+  useEffect(() => {
+    setOpen(false)
+    document.body.style.overflow = ''
+  }, [pathname])
+
+  const toggle = () => {
+    const next = !open
+    setOpen(next)
+    document.body.style.overflow = next ? 'hidden' : ''
+  }
+
+  return (
+    <header className={`nav ${home && y < 80 ? 'hide' : ''}`}>
+      <Link to="/" className="mark" aria-label="Home">
+        <img src="logo.png" alt="OWASP MANIT" />
+      </Link>
+
+      {/* Desktop nav links */}
       <div className="nav-links">
-        {LINKS.map(([to, l]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{l}</NavLink>)}
-        <NavLink to="/register" className="reg" onClick={() => setOpen(false)}>REGISTER</NavLink>
-        <div className="nav-links-sep" aria-hidden="true" />
-        <div className="nav-socials-row"><Socials /></div>
+        {LINKS.map(([to, l]) => (
+          <NavLink key={to} to={to} end>{l}</NavLink>
+        ))}
+        <NavLink to="/register" className="reg">REGISTER</NavLink>
       </div>
-    </nav>
-  </header>
+
+      {/* Burger for mobile */}
+      <button
+        className={`burger ${open ? 'open' : ''}`}
+        aria-label={open ? 'Close menu' : 'Open menu'}
+        aria-expanded={open}
+        onClick={toggle}
+      >
+        <span /><span /><span />
+      </button>
+
+      {/* Mobile slide-down menu */}
+      <nav className={open ? 'open' : ''} aria-hidden={!open}>
+        <div className="nav-links-mobile">
+          {LINKS.map(([to, l]) => (
+            <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{l}</NavLink>
+          ))}
+          <NavLink to="/register" className="reg mobile-reg" onClick={() => setOpen(false)}>REGISTER</NavLink>
+          <div className="nav-links-sep" aria-hidden="true" />
+          <div className="nav-socials-row"><Socials /></div>
+        </div>
+      </nav>
+    </header>
+  )
 }
 
 function Footer() {
@@ -160,7 +214,7 @@ function Footer() {
           <div className="footer__bg-text" aria-hidden="true">OWASP</div>
           <div className="footer__bottom">
             <span className="footer__copyright">
-              &copy; {new Date().getFullYear()} Cybersecurity OWASP Consortium, MANIT Bhopal. All rights reserved.
+              © {new Date().getFullYear()} Cybersecurity OWASP Consortium, MANIT Bhopal. All rights reserved.
             </span>
           </div>
         </div>
@@ -173,7 +227,7 @@ function Footer() {
 function useScramble(text, delay, go) {
   const [disp, setDisp] = useState(text)
   useEffect(() => {
-    if (!go || window.MOTION_REDUCED) return
+    if (!go || window.MOTION_REDUCED) { setDisp(text); return }
     let frame, start = Date.now()
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@%'
     const tick = () => {
@@ -204,7 +258,7 @@ function Magnetic({ children, className, style, "aria-label": label, href }) {
     setPos({ x: clamp(x * 0.3, -8, 8), y: clamp(y * 0.3, -8, 8) })
   }
   const ml = () => setPos({ x: 0, y: 0 })
-  return <a ref={ref} href={href} aria-label={label} className={className} style={{ ...style, transform: `translate(${pos.x}px, ${pos.y}px)` }} onMouseMove={mm} onMouseLeave={ml}>{children}</a>
+  return <a ref={ref} href={href} target="_blank" rel="noreferrer" aria-label={label} className={className} style={{ ...style, transform: `translate(${pos.x}px, ${pos.y}px)` }} onMouseMove={mm} onMouseLeave={ml}>{children}</a>
 }
 
 function Home() {
@@ -213,24 +267,25 @@ function Home() {
   const titleContainerRef = useRef()
   const [sel, setSel] = useState(null)
   const f = events[0]
-  
-  const [go, setGo] = useState(false)
+
+  // Fix: if preloader already done (sessionStorage), immediately set go=true
+  // This prevents a blank/frozen hero when navigating back from /register
+  const [go, setGo] = useState(() => {
+    try { return sessionStorage.getItem('pre') === '1' } catch { return false }
+  })
+
   useEffect(() => {
+    if (go) return  // already running
     const isReady = () => document.body.classList.contains('ready')
     if (isReady()) { setGo(true); return }
-    let tm = setTimeout(() => setGo(true), 4000)
+    let tm = setTimeout(() => setGo(true), 3500)
     const chk = setInterval(() => {
       if (isReady()) { setGo(true); clearInterval(chk); clearTimeout(tm) }
     }, 100)
     return () => { clearTimeout(tm); clearInterval(chk) }
   }, [])
 
-  useEffect(() => {
-    // 3D full-page network background is mounted globally in App component
-    // No per-hero canvas needed here
-  }, [])
-
-  const mv = e => { 
+  const mv = e => {
     if (matchMedia('(hover:none), (prefers-reduced-motion: reduce)').matches) return
     const b = heroRef.current.getBoundingClientRect()
     const px = (e.clientX - b.left) / b.width - 0.5
@@ -240,7 +295,7 @@ function Home() {
     root().setProperty('--rx', (-py * 8) + 'deg')
     root().setProperty('--ry', (px * 8) + 'deg')
   }
-  const rs = () => { 
+  const rs = () => {
     root().setProperty('--px', 0); root().setProperty('--py', 0)
     root().setProperty('--rx', '0deg'); root().setProperty('--ry', '0deg')
   }
@@ -281,8 +336,6 @@ function Home() {
 
   return <>
     <section className={`hero ${go ? 'hero-go' : ''}`} ref={heroRef} onMouseMove={mv} onMouseLeave={rs}>
-      {/* Background / Depth elements removed */}
-
       <div className="cyber-corners h-entry"><div className="cyber-corners-inner"></div></div>
       <div className="hero-tilt-wrap">
 
@@ -358,14 +411,14 @@ function About() {
     <section className="sec"><Eye>MILESTONES</Eye><h2 className="t">Our journey</h2>
       <ol className="jr">{journey.map(([y, d]) => <li key={y}><b>{y}</b><p>{d}</p></li>)}</ol></section></main>
 }
-const status = d => { const n = new Date().setHours(0, 0, 0, 0), x = new Date(d).setHours(0, 0, 0, 0); return x < n ? 'COMPLETED' : x === n ? 'LIVE' : 'UPCOMING' }
+
 function EvCard({ e, i, open }) {
   const s = status(e.date), dt = new Date(e.date)
   return <Rv d={i % 6}><article className={`ecard ev ${s.toLowerCase()}`}>
     <div className="dblock"><b>{String(dt.getDate()).padStart(2, '0')}</b><small>{dt.toLocaleString('en-GB', { month: 'short' }).toUpperCase()}</small></div>
     <div className="ebody"><div className="row"><span className="tag">{e.tag.toUpperCase()}</span><span className={`badge ${s.toLowerCase()}`}>● {s}</span></div>
       <h3>{e.title}</h3><p>{e.desc || 'Details coming soon.'}</p>
-      <div className="row foot"><small>LOC // {e.place || 'MANIT Bhopal'}</small><button onClick={() => open(e)}>{s === 'COMPLETED' ? 'VIEW DETAILS' : 'REGISTER'} →</button></div></div></article></Rv>
+      <div className="row foot"><small>LOC // {e.place || 'Auditorium, MANIT'}</small><button onClick={() => open(e)}>{s === 'COMPLETED' ? 'VIEW DETAILS' : 'REGISTER'} →</button></div></div></article></Rv>
 }
 function Events() {
   const [sel, setSel] = useState(null), [f, setF] = useState('All'), [q, setQ] = useState(''), [v, setV] = useState('GRID'), [asc, setAsc] = useState(true)
@@ -375,7 +428,7 @@ function Events() {
   return <main className="page"><Head eye="EVENTS DATABASE" a="All" b="Events"><p className="lead">Workshops, CTFs, talks, hackathons and more, past and upcoming.</p>
     <div className="mini row3">{[[events.length + past.length, 'TOTAL EVENTS'], [events.length, 'UPCOMING'], [past.length, 'COMPLETED']].map(([a, b]) => <div key={b}><b>{a}</b><small>{b}</small></div>)}</div></Head>
     <div className="next"><div><small className="mono">SYS // NEXT_EVENT</small><h2 className="t">{nx.title}</h2><small>{fmt(nx.date)} | LOC // {nx.place}</small>
-      <div className="nbtns"><a className="btn red" href={REG_URL}>REGISTER →</a><button className="btn" onClick={() => setSel(nx)}>DETAILS</button></div></div>
+      <div className="nbtns"><Link className="btn red" to="/register">REGISTER →</Link><button className="btn" onClick={() => setSel(nx)}>DETAILS</button></div></div>
       <div className="cd" aria-label="Countdown">{c.map(([l, n]) => <div key={l}><b key={n} className="tick">{String(n).padStart(2, '0')}</b><small>{l.toUpperCase()}</small></div>)}</div></div>
     <div className="tools"><div className="chips">{tags.map(t => <button key={t} className={f === t ? 'on' : ''} onClick={() => setF(t)}>{t}</button>)}</div>
       <input placeholder="Search events..." value={q} onChange={e => setQ(e.target.value)} aria-label="Search events" />
@@ -385,12 +438,18 @@ function Events() {
       {v === 'TIMELINE' && <ol className="tl">{list.map(e => <li key={e.title}><b>{fmt(e.date)}</b><h3>{e.title}</h3><p>{e.desc}</p></li>)}</ol>}
       {v === 'TERMINAL' && <pre className="termout">{list.map((e, i) => `$ cat entry_${pad(i + 1)}   ${fmt(e.date)}   ${e.title}   [${e.tag}]`).join('\n')}</pre>}</>}
     <div className="phd"><h3 className="mono sm">ARCHIVE // PAST EVENTS</h3><small>{old.length} completed</small></div>
-    <div className="car">{old.map((e, i) => <article key={i} className="ecard old"><div className="row"><small>ARCHIVE_{pad(i + 1)}</small><span className="tag">{e.tag.toUpperCase()}</span></div><small className="mono">{fmt(e.date)}</small><h3>{e.title.toUpperCase()}</h3><div className="row foot"><small>LOC // MANIT Bhopal</small><button onClick={() => setSel(e)}>VIEW DETAILS →</button></div></article>)}</div>
+    <div className="car">{old.map((e, i) => <article key={i} className="ecard old"><div className="row"><small>ARCHIVE_{pad(i + 1)}</small><span className="tag">{e.tag.toUpperCase()}</span></div><small className="mono">{fmt(e.date)}</small><h3>{e.title.toUpperCase()}</h3><div className="row foot"><small>LOC // Auditorium, MANIT</small><button onClick={() => setSel(e)}>VIEW DETAILS →</button></div></article>)}</div>
     {sel && <Modal e={sel} close={() => setSel(null)} />}</main>
 }
+
 function Gallery() {
   const [f, setF] = useState('All'), [sel, setSel] = useState(null), tx = useRef(0)
-  const evs = ['All', ...new Set(gallery.map(g => g.ev))], list = gallery.map((g, i) => ({ ...g, n: i + 1 })).filter(g => f === 'All' || g.ev === f)
+  const evs = ['All', ...new Set(gallery.map(g => g.ev))]
+
+  // Assign numbered fallback src for items without explicit src
+  const numbered = gallery.map((g, i) => ({ ...g, n: i + 1, imgSrc: g.src ? `gallery/${g.src}` : `gallery/${i + 1}.jpg` }))
+  const list = numbered.filter(g => f === 'All' || g.ev === f)
+
   const go = d => setSel(s => (s + d + list.length) % list.length)
   useEffect(() => {
     if (sel === null) return
@@ -400,22 +459,36 @@ function Gallery() {
   const cur = sel !== null && list[sel]
   return <main className="page"><Head eye="GALLERY" a="Event" b="Cutouts" />
     <div className="chips gf">{evs.map(e => <button key={e} className={f === e ? 'on' : ''} onClick={() => { setF(e); setSel(null) }}>{e}</button>)}</div>
+
+    {/* QR Code spotlight – shown when filter includes it */}
+    {list.find(g => g.qr) && (
+      <div className="qr-spotlight">
+        <small className="mono">// REGISTER VIA QR</small>
+        <div className="qr-wrap">
+          <img src={`${import.meta.env.BASE_URL}gallery/qr.jpg`} alt="CYBERPULSE Registration QR Code" />
+        </div>
+        <p>Scan to register for <strong>CYBERPULSE</strong></p>
+        <Link className="btn red" to="/register">REGISTER ONLINE →</Link>
+      </div>
+    )}
+
     <Slider className="gallery-slider" autoplay={3000}>
-      {gallery.slice(0,4).map((i, k) => <div key={k} className="coverflow-slide">
-        <Img src={`gallery/${i.src}`} label={i.tag} cls="ph bgimg" />
-        <div className="gcap"><b>{i.title}</b><br /><small>{i.tag}</small></div>
+      {numbered.slice(0, 4).map((item, k) => <div key={k} className="coverflow-slide">
+        <Img src={item.imgSrc} label={item.ev} cls="ph bgimg" />
+        <div className="gcap"><b>{item.ev}</b><br /><small>{item.date}</small></div>
       </div>)}
     </Slider>
-    <br/><br/>
+    <br /><br />
     <div className="bento">{list.map((g, i) => <Rv key={g.n} d={i % 6} className={`gi ${g.s}`}><button className="tile" onClick={() => setSel(i)} aria-label={`Open photo ${g.n}: ${g.ev}`}>
-      <Img src={`gallery/${g.n}.jpg`} label={`Photo ${g.n}`} /><div className="gcap"><b>{g.ev}</b><small>{g.date}</small></div></button></Rv>)}</div>
+      <Img src={g.imgSrc} label={`Photo ${g.n}`} /><div className="gcap"><b>{g.ev}</b><small>{g.date}</small></div></button></Rv>)}</div>
     {cur && <div className="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={() => setSel(null)} onTouchStart={e => (tx.current = e.touches[0].clientX)} onTouchEnd={e => { const d = e.changedTouches[0].clientX - tx.current; if (Math.abs(d) > 50) go(d < 0 ? 1 : -1) }}>
       <button className="x" aria-label="Close" onClick={() => setSel(null)}>✕</button>
       <button className="lbn l" aria-label="Previous photo" onClick={e => { e.stopPropagation(); go(-1) }}>‹</button>
-      <figure onClick={e => e.stopPropagation()}><div className="lbimg"><Img src={`gallery/${cur.n}.jpg`} label={`Photo ${cur.n}`} /></div>
+      <figure onClick={e => e.stopPropagation()}><div className="lbimg"><Img src={cur.imgSrc} label={`Photo ${cur.n}`} /></div>
         <figcaption className="lbcap"><b>{cur.ev}</b><small>{cur.date} · {sel + 1} / {list.length}</small></figcaption></figure>
       <button className="lbn r" aria-label="Next photo" onClick={e => { e.stopPropagation(); go(1) }}>›</button></div>}</main>
 }
+
 function Sponsors() {
   const levels = { Gold: 'LEVEL_3', Silver: 'LEVEL_2', Community: 'LEVEL_1' };
   return (
@@ -472,7 +545,7 @@ function Contact() {
   }
   return <main className="page"><Head eye="CONTACT" a="Let's" b="connect."><p className="lead">New member, collaborator, sponsor, or want to conduct a workshop? We're all ears.</p></Head>
     <div className="two ct"><div>
-      {[['LOCATION', 'MANIT Bhopal, Madhya Pradesh'], ['EMAIL', EMAIL]].map(([a, b]) => <div key={a} className="info"><small>{a}</small><b>{b}</b></div>)}
+      {[['LOCATION', 'Auditorium, MANIT Bhopal, Madhya Pradesh'], ['EMAIL', EMAIL]].map(([a, b]) => <div key={a} className="info"><small>{a}</small><b>{b}</b></div>)}
       <div className="info"><small>SOCIALS</small><div className="soc l"><Socials /></div></div>
       <div className="map"><small className="cap">SYS // MEET.US.IN | BHOPAL, MP</small><a className="btn" href="https://www.google.com/maps/search/MANIT+Bhopal" target="_blank" rel="noreferrer">OPEN IN MAPS</a></div></div>
       <Win file="contact.sh // secure channel" status="● ONLINE"><form className="form" onSubmit={send}>
@@ -482,17 +555,31 @@ function Contact() {
         <button className="btn red">SEND MESSAGE →</button><p role="status" className="mono sm">{st || 'Encrypted + 1 week'}</p></form></Win></div></main>
 }
 
+/* ---------- page transition (optimized) ---------- */
 function TerminalWipe() {
   const { pathname } = useLocation();
   const [wiping, setWiping] = useState(false);
+  const prev = useRef(pathname);
   useEffect(() => {
+    if (prev.current === pathname) return;
+    prev.current = pathname;
     setWiping(true);
-    const t = setTimeout(() => setWiping(false), 500);
+    const t = setTimeout(() => setWiping(false), 280);
     return () => clearTimeout(t);
   }, [pathname]);
   return <div className={`twipe ${wiping ? 'active' : ''}`}><span className="mono">cd {pathname === '/' ? '/home' : pathname} ...</span></div>;
 }
 
+/* ---------- loading fallback ---------- */
+function PageLoader() {
+  return (
+    <div style={{ minHeight: '100svh', display: 'grid', placeItems: 'center', fontFamily: 'var(--mono)', color: 'var(--mute)', fontSize: '.8rem', letterSpacing: '.12em' }}>
+      LOADING...
+    </div>
+  )
+}
+
+/* ---------- app shell ---------- */
 export default function App() {
   const [scrollPct, setScrollPct] = useState(0)
   useEffect(() => {
@@ -501,7 +588,7 @@ export default function App() {
       const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) || 0;
       setScrollPct(pct);
     }
-    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const [motion, setMotion] = useState(() => {
@@ -518,34 +605,58 @@ export default function App() {
     try { localStorage.setItem('motion', motion ? 'on' : 'off') } catch {}
   }, [motion]);
 
-  const [ready, setReady] = useState(() => { try { return sessionStorage.getItem('pre') === '1' } catch { return false } }), { pathname } = useLocation()
-  useEffect(() => window.scrollTo(0, 0), [pathname])
+  const [ready, setReady] = useState(() => { try { return sessionStorage.getItem('pre') === '1' } catch { return false } })
+  const { pathname } = useLocation()
+
+  // Scroll to top on route change
+  useEffect(() => window.scrollTo({ top: 0, behavior: 'instant' }), [pathname])
   useEffect(() => { document.body.classList.toggle('ready', ready) }, [ready])
+
+  // body.scrolled class — used for rail visibility and nav show/hide
   useEffect(() => {
     if (pathname !== '/') { document.body.classList.add('scrolled'); return }
     const hs = () => document.body.classList.toggle('scrolled', window.scrollY > window.innerHeight * 0.4)
     window.addEventListener('scroll', hs, { passive: true }); hs()
     return () => window.removeEventListener('scroll', hs)
   }, [pathname])
-  
+
+  // Safety: hide preloader after 3s max
   useEffect(() => {
     if (ready) return
     const tm = setTimeout(() => done(), 3000)
     return () => clearTimeout(tm)
   }, [ready])
-const done = () => { try { sessionStorage.setItem('pre', '1') } catch {} setReady(true) }
 
-  // Mount full-page 3D network background once (persists across all routes)
+  const done = () => { try { sessionStorage.setItem('pre', '1') } catch {} setReady(true) }
+
+  // Mount full-page 3D background once
   useEffect(() => {
     const bg = mountNetworkBg3D(null, { quietEl: null });
     return () => bg.destroy();
   }, []);
+
   return <>
+    {/* Scroll progress bar */}
+    <div className="scroll-progress" style={{ '--scroll': `${scrollPct * 100}%` }} aria-hidden="true" />
+
     <TerminalWipe />
     {!ready && <Preloader onDone={done} />}
-    <Nav /><aside className="rail"><Socials /></aside>
-    <Routes><Route path="/" element={<Home />} /><Route path="/about" element={<About />} /><Route path="/events" element={<Events />} /><Route path="/gallery" element={<Gallery />} />
-      <Route path="/team" element={<Team />} /><Route path="/contact" element={<Contact />} />
-      <Route path="/register" element={<Registration />} /></Routes>
-    <Footer /></>
+    <Nav />
+    <aside className="rail"><Socials /></aside>
+
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/team" element={<Team />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/register" element={<Registration />} />
+        {/* Catch-all: redirect unknown paths to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
+    <Footer />
+  </>
 }

@@ -3,9 +3,10 @@
 // Update this file to change anything on the site.
 // ============================================================
 
-export const EMAIL = 'owasp@manit.ac.in'
+export const EMAIL = 'owasp.chap.manit@gmail.com'
 export const FORM_ENDPOINT = ''        // Formspree / Web3Forms POST URL
 export const REG_URL = '/register'    // Registration page route
+export const VENUE = 'Auditorium, MANIT'
 
 export const SOCIALS = [
   ['instagram', 'https://www.instagram.com/owasp.manit/'],
@@ -16,11 +17,11 @@ export const SOCIALS = [
 
 // ── Upcoming Events ───────────────────────────────────────────
 export const events = [
-  { title: 'CYBERPULSE', date: '2026-10-10', tag: 'Workshop', place: 'MANIT Bhopal', desc: 'Ethical Hacking & Web Security Workshop. Dive into real-world hacking demos, bug bounty basics, AI in cybersecurity, and more.' },
-  { title: 'NetShield Workshop', date: '2026-10-15', tag: 'Workshop', place: 'MANIT Bhopal', desc: 'Practical exposure to ethical hacking, networking, and system defense.' },
-  { title: 'Capture The Flag (Internal)', date: '2026-11-08', tag: 'CTF', place: 'MANIT Bhopal', desc: 'Test your skills across web exploitation, crypto, forensics, and reverse engineering.' },
-  { title: 'Linux for Security Professionals', date: '2026-11-19', tag: 'Tech Talk', place: 'MANIT Bhopal', desc: 'Hands-on session on Linux fundamentals, bash scripting, and command-line security tools.' },
-  { title: 'Secure Coding with OWASP', date: '2026-12-06', tag: 'Hackathon', place: 'MANIT Bhopal', desc: 'Best practices and hands-on coding focused on building secure applications.' },
+  { title: 'CYBERPULSE', date: '2026-10-10', tag: 'Workshop', place: 'Auditorium, MANIT', desc: 'Ethical Hacking & Web Security Workshop. Dive into real-world hacking demos, bug bounty basics, AI in cybersecurity, and more.' },
+  { title: 'NetShield Workshop', date: '2026-10-15', tag: 'Workshop', place: 'Auditorium, MANIT', desc: 'Practical exposure to ethical hacking, networking, and system defense.' },
+  { title: 'Capture The Flag (Internal)', date: '2026-11-08', tag: 'CTF', place: 'Auditorium, MANIT', desc: 'Test your skills across web exploitation, crypto, forensics, and reverse engineering.' },
+  { title: 'Linux for Security Professionals', date: '2026-11-19', tag: 'Tech Talk', place: 'Auditorium, MANIT', desc: 'Hands-on session on Linux fundamentals, bash scripting, and command-line security tools.' },
+  { title: 'Secure Coding with OWASP', date: '2026-12-06', tag: 'Hackathon', place: 'Auditorium, MANIT', desc: 'Best practices and hands-on coding focused on building secure applications.' },
 ]
 
 // ── Past Events ───────────────────────────────────────────────
@@ -114,8 +115,11 @@ export const sponsors = {
 }
 
 // ── Gallery ───────────────────────────────────────────────────
-const g = (ev, date, s = '') => ({ ev, date, s })
+// Helper: g(event, date, span_class, optional_src)
+const g = (ev, date, s = '', src = '') => ({ ev, date, s, src })
 export const gallery = [
+  // QR code added first — displayed prominently
+  { ev: 'CYBERPULSE – Register', date: 'OCT 2026', s: 'w', src: 'qr.jpg', qr: true },
   g('CyberHunter 2.0',  'FEB 2026', 'w'), g('CyberHunter 2.0',  'FEB 2026', 't'),
   g('OWASP CTF',        'MAY 2025'),       g('OWASP CTF',        'MAY 2025', 'w'),
   g('Noobathon',        'OCT 2025', 't'),  g('Noobathon',        'OCT 2025'),
