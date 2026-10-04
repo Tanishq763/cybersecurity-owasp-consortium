@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, Suspense, lazy } from 'react';
+import React, { useRef, useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import Slider from './components/Slider';
 import { Routes, Route, NavLink, Link, useLocation, Navigate } from 'react-router-dom'
 import { EMAIL, FORM_ENDPOINT, REG_URL, SOCIALS, events, past, stats, programs, journey, collabs, team, members, sponsors, gallery } from './data.js'
@@ -129,6 +129,7 @@ function Nav() {
   const home = pathname === '/'
   const [y, setY] = useState(0)
   const [open, setOpen] = useState(false)
+  const mobileNavRef = useRef()
 
   useEffect(() => {
     const f = () => setY(scrollY)
@@ -142,6 +143,17 @@ function Nav() {
     setOpen(false)
     document.body.style.overflow = ''
   }, [pathname])
+
+  // Sync inert attribute — prevents focus/aria-hidden conflict
+  useEffect(() => {
+    const el = mobileNavRef.current
+    if (!el) return
+    if (open) {
+      el.removeAttribute('inert')
+    } else {
+      el.setAttribute('inert', '')
+    }
+  }, [open])
 
   const toggle = () => {
     const next = !open
@@ -173,8 +185,8 @@ function Nav() {
         <span /><span /><span />
       </button>
 
-      {/* Mobile slide-down menu */}
-      <nav className={open ? 'open' : ''} aria-hidden={!open}>
+      {/* Mobile slide-down menu — inert when closed so focus can't enter */}
+      <nav ref={mobileNavRef} className={open ? 'open' : ''} aria-hidden={!open}>
         <div className="nav-links-mobile">
           {LINKS.map(([to, l]) => (
             <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{l}</NavLink>
@@ -268,16 +280,17 @@ function Home() {
   const [sel, setSel] = useState(null)
   const f = events[0]
 
-  // Fix: if preloader already done (sessionStorage), immediately set go=true
-  // This prevents a blank/frozen hero when navigating back from /register
+  // Derive `go` from body.ready — works both on first load AND on back-navigation.
+  // body.ready is toggled by App whenever `ready` state changes, so this is
+  // always accurate even when Home remounts after visiting /register.
   const [go, setGo] = useState(() => {
-    try { return sessionStorage.getItem('pre') === '1' } catch { return false }
+    try { return document.body.classList.contains('ready') || sessionStorage.getItem('pre') === '1' } catch { return document.body.classList.contains('ready') }
   })
 
   useEffect(() => {
-    if (go) return  // already running
+    // If already ready at mount time (back-nav), flip immediately.
+    if (document.body.classList.contains('ready')) { setGo(true); return }
     const isReady = () => document.body.classList.contains('ready')
-    if (isReady()) { setGo(true); return }
     let tm = setTimeout(() => setGo(true), 3500)
     const chk = setInterval(() => {
       if (isReady()) { setGo(true); clearInterval(chk); clearTimeout(tm) }
@@ -287,6 +300,7 @@ function Home() {
 
   const mv = e => {
     if (matchMedia('(hover:none), (prefers-reduced-motion: reduce)').matches) return
+    if (!heroRef.current) return
     const b = heroRef.current.getBoundingClientRect()
     const px = (e.clientX - b.left) / b.width - 0.5
     const py = (e.clientY - b.top) / b.height - 0.5
@@ -299,7 +313,15 @@ function Home() {
     root().setProperty('--px', 0); root().setProperty('--py', 0)
     root().setProperty('--rx', '0deg'); root().setProperty('--ry', '0deg')
   }
-  useEffect(() => rs, [])
+  // On every mount: reset tilt vars AND reset hero parallax so a stale
+  // scroll offset from a previous visit never hides the hero.
+  useEffect(() => {
+    rs()
+    root().setProperty('--sy', '0px')
+    root().setProperty('--hero-op', '1')
+    root().setProperty('--hero-scale', '1')
+    return rs
+  }, [])
 
   useEffect(() => {
     if (window.MOTION_REDUCED) return
@@ -608,13 +630,23 @@ export default function App() {
   const [ready, setReady] = useState(() => { try { return sessionStorage.getItem('pre') === '1' } catch { return false } })
   const { pathname } = useLocation()
 
+  // Define done() before the useEffect that references it to avoid stale closure.
+  const done = useCallback(() => { try { sessionStorage.setItem('pre', '1') } catch {} setReady(true) }, [])
+
   // Scroll to top on route change
-  useEffect(() => window.scrollTo({ top: 0, behavior: 'instant' }), [pathname])
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [pathname])
   useEffect(() => { document.body.classList.toggle('ready', ready) }, [ready])
 
   // body.scrolled class — used for rail visibility and nav show/hide
   useEffect(() => {
-    if (pathname !== '/') { document.body.classList.add('scrolled'); return }
+    if (pathname !== '/') {
+      document.body.classList.add('scrolled')
+      // When leaving home, also reset hero parallax so back-nav starts clean.
+      document.documentElement.style.setProperty('--hero-op', '1')
+      document.documentElement.style.setProperty('--hero-scale', '1')
+      document.documentElement.style.setProperty('--sy', '0px')
+      return
+    }
     const hs = () => document.body.classList.toggle('scrolled', window.scrollY > window.innerHeight * 0.4)
     window.addEventListener('scroll', hs, { passive: true }); hs()
     return () => window.removeEventListener('scroll', hs)
@@ -623,11 +655,9 @@ export default function App() {
   // Safety: hide preloader after 3s max
   useEffect(() => {
     if (ready) return
-    const tm = setTimeout(() => done(), 3000)
+    const tm = setTimeout(done, 3000)
     return () => clearTimeout(tm)
-  }, [ready])
-
-  const done = () => { try { sessionStorage.setItem('pre', '1') } catch {} setReady(true) }
+  }, [ready, done])
 
   // Mount full-page 3D background once
   useEffect(() => {
