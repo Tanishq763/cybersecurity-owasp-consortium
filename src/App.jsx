@@ -281,6 +281,8 @@ function Home() {
   const [sel, setSel] = useState(null)
   const f = events[0]
 
+
+
   // Derive `go` from body.ready — works both on first load AND on back-navigation.
   // body.ready is toggled by App whenever `ready` state changes, so this is
   // always accurate even when Home remounts after visiting /register.
@@ -298,6 +300,21 @@ function Home() {
     }, 100)
     return () => { clearTimeout(tm); clearInterval(chk) }
   }, [])
+
+  const [showPromo, setShowPromo] = useState(false);
+  const promoShown = useRef(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Trigger when user scrolls past 80% of the hero (viewport height)
+      if (!promoShown.current && window.scrollY > window.innerHeight * 0.8) {
+        promoShown.current = true;
+        setShowPromo(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const mv = e => {
     if (matchMedia('(hover:none), (prefers-reduced-motion: reduce)').matches) return
@@ -418,6 +435,18 @@ function Home() {
       <div className="center"><Eye>04 — CONNECTED BY SECURITY</Eye><h2 className="t">Collaborations</h2><p>Working together for a stronger cybersecurity ecosystem.</p></div>
       <div className="collab-grid">{collabs.map(([img, n], i) => <Rv key={n} d={i}><div className="collab-card"><div className="collab-init"><img src={img} alt={n} /></div><small>{n.toUpperCase()}</small></div></Rv>)}</div></Win>
     {sel && <Modal e={sel} close={() => setSel(null)} />}
+    {showPromo && (
+      <div className="overlay" onClick={() => setShowPromo(false)} style={{zIndex: 9999}}>
+        <div className="win modal visible" role="dialog" aria-modal="true" aria-label="CyberPulse Registration" onClick={x => x.stopPropagation()}>
+          <button className="x" aria-label="Close" onClick={() => setShowPromo(false)}>✕</button>
+          <small className="mono">UPCOMING EVENT · 10 OCT 2026</small>
+          <h2 className="t sm">CYBERPULSE</h2>
+          <p style={{marginBottom: '1rem'}}>Join the event on 10th Oct and get a chance to win a watch, powerbank, earbuds, and other prizes worth <b>₹7K</b>!</p>
+          <p className="mono sm">LOC // Auditorium, MANIT</p>
+          <Link className="btn red" to="/register" onClick={() => setShowPromo(false)}>REGISTER NOW →</Link>
+        </div>
+      </div>
+    )}
   </>
 }
 const Head = ({ eye, a, b, children }) => <header className="phead"><Eye>{eye}</Eye><h1 className="t"><span className="out">{a}</span><br />{b}</h1>{children}</header>
