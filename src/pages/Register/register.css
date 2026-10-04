@@ -124,7 +124,23 @@
   text-transform: uppercase;
   margin-bottom: .5rem;
 }
-.cp-options-sub { color: #777; font-size: .9rem; margin-bottom: 2.5rem; }
+.cp-options-sub { color: #777; font-size: .9rem; margin-bottom: 1.5rem; }
+
+.cp-prizes-banner {
+  background: rgba(128, 128, 128, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  margin: 0 auto 2.5rem auto;
+  color: #ddd;
+  font-size: 0.95rem;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.cp-prizes-banner b {
+  color: #ffd700;
+}
 
 /* Two cards */
 .cp-option-cards {

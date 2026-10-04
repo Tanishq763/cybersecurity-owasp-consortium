@@ -15,6 +15,10 @@ export default function RegisterOptions() {
         <h2 className="cp-options-title">Secure Your Spot.</h2>
         <p className="cp-options-sub">Choose your participant type to get started.</p>
 
+        <div className="cp-prizes-banner">
+          🎁 Register now to win goodies like a watch, powerbank, earbuds, and other prizes worth <b>7K</b>!
+        </div>
+
         <div className="cp-option-cards">
           {/* MANIT */}
           <div className="cp-option-card">
