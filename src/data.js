@@ -59,13 +59,19 @@ export const journey = [
   ['2024', 'Growth',       '200+ members, 15+ events, national CTF winners.'],
 ]
 
+import owaspBhopalImg from './assets/owasp_bhopal.png'
+import gdgImg from './assets/gdg.jpg'
+import awsImg from './assets/aws-ug-bhopal.svg'
+import mlBhopalImg from './assets/ml_bhopal.png'
+import iseaImg from './assets/isea.png'
+
 // ── Collaborators ─────────────────────────────────────────────
 export const collabs = [
-  ['OB', 'OWASP Bhopal'],
-  ['GD', 'GDG Bhopal'],
-  ['AW', 'AWS Users Group Bhopal'],
-  ['ML', 'ML Bhopal'],
-  ['IS', 'ISEA'],
+  [owaspBhopalImg, 'OWASP Bhopal'],
+  [gdgImg, 'GDG Bhopal'],
+  [awsImg, 'AWS Users Group Bhopal'],
+  [mlBhopalImg, 'ML Bhopal'],
+  [iseaImg, 'ISEA'],
 ]
 
 // ── Team Data (real members) ──────────────────────────────────
@@ -118,8 +124,7 @@ export const sponsors = {
 // Helper: g(event, date, span_class, optional_src)
 const g = (ev, date, s = '', src = '') => ({ ev, date, s, src })
 export const gallery = [
-  // QR code added first — displayed prominently
-  { ev: 'CYBERPULSE – Register', date: 'OCT 2026', s: 'w', src: 'qr.jpg', qr: true },
+  // Gallery images
   g('CyberHunter 2.0',  'FEB 2026', 'w'), g('CyberHunter 2.0',  'FEB 2026', 't'),
   g('OWASP CTF',        'MAY 2025'),       g('OWASP CTF',        'MAY 2025', 'w'),
   g('Noobathon',        'OCT 2025', 't'),  g('Noobathon',        'OCT 2025'),
