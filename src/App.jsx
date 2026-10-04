@@ -3,6 +3,7 @@ import Slider from './components/Slider';
 import { Routes, Route, NavLink, Link, useLocation, Navigate } from 'react-router-dom'
 import { EMAIL, FORM_ENDPOINT, SOCIALS, events, past, stats, programs, journey, collabs, team, gallery } from './data.js'
 import { mountNetworkBg3D } from './network-bg-3d.js'
+import manitImg from './assets/manit.jpg'
 
 // Lazy-load the heavy registration page so it doesn't bloat initial bundle
 const Registration = lazy(() => import('./pages/Register'))
@@ -164,7 +165,7 @@ function Nav() {
   return (
     <header className={`nav ${home && y < 80 ? 'hide' : ''}`}>
       <Link to="/" className="mark" aria-label="Home">
-        CYBERPULSE
+        <img src="logo.png" alt="OWASP MANIT" />
       </Link>
 
       {/* Desktop nav links */}
@@ -172,7 +173,7 @@ function Nav() {
         {LINKS.map(([to, l]) => (
           <NavLink key={to} to={to} end>{l}</NavLink>
         ))}
-        <NavLink to="/register" className="reg">REGISTER</NavLink>
+        <NavLink to="/register" className="reg">CYBERPULSE</NavLink>
       </div>
 
       {/* Burger for mobile */}
@@ -191,7 +192,7 @@ function Nav() {
           {LINKS.map(([to, l]) => (
             <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{l}</NavLink>
           ))}
-          <NavLink to="/register" className="reg mobile-reg" onClick={() => setOpen(false)}>REGISTER</NavLink>
+          <NavLink to="/register" className="reg mobile-reg" onClick={() => setOpen(false)}>CYBERPULSE</NavLink>
           <div className="nav-links-sep" aria-hidden="true" />
           <div className="nav-socials-row"><Socials /></div>
         </div>
@@ -401,7 +402,7 @@ function Home() {
     </section>
     <div id="next-sec"></div>
     <Win file="about_us.exe" status={<><span className="pulse-dot">●</span> RUNNING</>}><div className="two">
-      <div className="shot"><Img src="about.jpg" label="Campus photo (public/about.jpg)" cls="tall" /><small className="cap">SYS // MANIT.BHOPAL.IN</small></div>
+      <div className="shot"><Img src={manitImg} label="Campus photo" cls="tall" /><small className="cap">SYS // MANIT.BHOPAL.IN</small></div>
       <div><Eye>01 — ABOUT CYBERSECURITY OWASP CONSORTIUM</Eye><h2 className="t">More than a club.</h2>
         <p className="lead">A community built around cybersecurity. Cybersecurity OWASP Consortium at MANIT Bhopal focuses on cybersecurity education, practical security research, workshops, open-source projects and community building.</p>
         <div className="mini">{[['200+', 'MEMBERS'], ['15+', 'EVENTS'], ['5+', 'YEARS']].map(([a, b]) => <div key={b}><b>{a}</b><small>{b}</small></div>)}</div>
@@ -415,7 +416,7 @@ function Home() {
       <Slider autoplay={4000} className="events-slider">{events.slice(1).map((e, i) => <EvCard key={i} e={e} i={i} open={setSel} />)}</Slider></Win>
     <Win file="network.bat" status={<><span className="pulse-dot">●</span> CONNECTED</>}>
       <div className="center"><Eye>04 — CONNECTED BY SECURITY</Eye><h2 className="t">Collaborations</h2><p>Working together for a stronger cybersecurity ecosystem.</p></div>
-      <div className="collab-grid">{collabs.map(([a, n], i) => <Rv key={n} d={i}><div className="collab-card"><div className="collab-init">{a}</div><small>{n.toUpperCase()}</small></div></Rv>)}</div></Win>
+      <div className="collab-grid">{collabs.map(([img, n], i) => <Rv key={n} d={i}><div className="collab-card"><div className="collab-init"><img src={img} alt={n} /></div><small>{n.toUpperCase()}</small></div></Rv>)}</div></Win>
     {sel && <Modal e={sel} close={() => setSel(null)} />}
   </>
 }
@@ -424,7 +425,7 @@ function About() {
   return <main className="page"><Head eye="01 — ABOUT US" a="Securing tomorrow" b="together."><div className="two lh">
     <div><p className="lead">Cybersecurity OWASP Consortium, MANIT Bhopal is a student-driven community dedicated to promoting cybersecurity awareness, learning and innovation.</p>
       <div className="cta l"><Link className="btn" to="/team">MEET THE TEAM →</Link><Link className="btn" to="/contact">GET IN TOUCH</Link></div></div>
-    <div className="shot r"><Img src="about.jpg" label="Campus photo" cls="tall" /><small className="cap">SYS // MANIT.AC.IN — BHOPAL, MP</small></div></div></Head>
+    <div className="shot r"><Img src={manitImg} label="Campus photo" cls="tall" /><small className="cap">SYS // MANIT.AC.IN — BHOPAL, MP</small></div></div></Head>
     <div className="stats5">{stats.map(([a, b]) => <div key={b}><b>{a}</b><small>{b.toUpperCase()}</small></div>)}</div>
     <div className="vm"><div><small className="mono">// VISION</small><h2 className="t sm">Shaping the future of cybersecurity.</h2><p>To build a safer digital world by empowering students with the right skills, knowledge and community. We envision a future where every developer thinks security-first.</p></div>
       <div className="rt"><small className="mono">// MISSION</small><h2 className="t sm">Education, practice &amp; collaboration.</h2><p>To educate, enable and encourage the next generation of cybersecurity professionals through hands-on learning, events, research and collaboration with industry and academia.</p></div></div>
