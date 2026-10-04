@@ -1,23 +1,44 @@
-import React from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { CYBERPULSE } from '../../cyberpulse.config';
 
-function generateIcs({ name, email }) {
-  const dt = CYBERPULSE.date.replace(/[-:]/g, '').replace('T', 'T').slice(0, 15) + '00Z';
-  const ics = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//OWASP MANIT//CYBERPULSE//EN',
+function generateIcsContent() {
+  // Convert local IST date to UTC for ICS (IST = UTC+5:30)
+  const local = new Date(CYBERPULSE.date);
+  const utcStr = local.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+  // DTEND = 6 hours after start
+  const end = new Date(local.getTime() + 6 * 60 * 60 * 1000);
+  const endStr = end.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+  const uid = `cyberpulse-2026-${Date.now()}@owasp-manit.in`;
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//OWASP MANIT//CYBERPULSE//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `DTSTART:${dt}`,
-    `SUMMARY:${CYBERPULSE.name} – ${CYBERPULSE.tagline}`,
-    `DESCRIPTION:${CYBERPULSE.organiser}`,
+    `UID:${uid}`,
+    `DTSTART:${utcStr}`,
+    `DTEND:${endStr}`,
+    `SUMMARY:${CYBERPULSE.name} \u2013 ${CYBERPULSE.tagline}`,
+    `DESCRIPTION:${CYBERPULSE.organiser}\\nRegistration: https://owasp-manit.in/register`,
     `LOCATION:${CYBERPULSE.venue}`,
-    'END:VEVENT', 'END:VCALENDAR',
+    'STATUS:CONFIRMED',
+    'END:VEVENT',
+    'END:VCALENDAR',
   ].join('\r\n');
-  const blob = new Blob([ics], { type: 'text/calendar' });
-  return URL.createObjectURL(blob);
 }
 
 export default function SuccessCard({ regId, name, email, isManit, plan, onClose }) {
-  const icsUrl = generateIcs({ name, email });
+  // Create blob URL once and revoke on unmount — prevents memory leak on every re-render
+  const icsUrl = useMemo(() => {
+    const blob = new Blob([generateIcsContent()], { type: 'text/calendar;charset=utf-8' });
+    return URL.createObjectURL(blob);
+  }, []);
+
+  useEffect(() => {
+    return () => URL.revokeObjectURL(icsUrl);
+  }, [icsUrl]);
 
   return (
     <div className="cp-success">

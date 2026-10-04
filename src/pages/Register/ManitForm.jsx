@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { CYBERPULSE } from '../../cyberpulse.config';
 import SuccessCard from './SuccessCard';
 
@@ -8,7 +8,7 @@ function Field({ label, required, hint, error, children }) {
       <label>{label}{required && <b> *</b>}</label>
       {children}
       {hint && !error && <p className="cp-field-hint">{hint}</p>}
-      {error && <p className="cp-field-error" role="alert">? {error}</p>}
+      {error && <p className="cp-field-error" role="alert">⚠ {error}</p>}
     </div>
   );
 }
@@ -45,7 +45,6 @@ export default function ManitForm({ onClose }) {
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [errMsg, setErrMsg] = useState('');
   const [regId, setRegId] = useState('');
-  const firstErrRef = useRef();
 
   const set = (k, v) => {
     setFields(f => ({ ...f, [k]: v }));
@@ -71,12 +70,17 @@ export default function ManitForm({ onClose }) {
 
     setStatus('loading');
     try {
-      $id = 'CP-2026-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      const id = 'CP-2026-' + Math.random().toString(36).slice(2, 8).toUpperCase();
       const payload = {
-        regId: $id,
-        college: 'MANIT',
+        regId: id,
         type: 'manit',
-        ...fields,
+        name: fields.name,
+        email: fields.email,
+        phone: fields.phone,
+        scholar: fields.scholar,
+        college: 'MANIT',
+        year: fields.year,
+        branch: fields.branch,
         isManit: true,
         _hp: '',
         submittedAt: new Date().toISOString(),
@@ -96,8 +100,7 @@ export default function ManitForm({ onClose }) {
         if (result.status === 'error') throw new Error('Google Script Error: ' + result.message);
       }
 
-      
-      setRegId($id);
+      setRegId(id);
       setStatus('success');
     } catch (err) {
       setStatus('error');
@@ -227,7 +230,7 @@ export default function ManitForm({ onClose }) {
 
       <div className="cp-modal-footer" style={{ margin: '0 -2rem -2rem', padding: '1.2rem 2rem' }}>
         {status === 'error' && (
-          <p style={{ color: 'var(--red)', font: '.8rem var(--mono)', flex: 1 }}>? {errMsg}</p>
+          <p style={{ color: 'var(--red)', font: '.8rem var(--mono)', flex: 1 }}>⚠ {errMsg}</p>
         )}
         <button
           type="submit"

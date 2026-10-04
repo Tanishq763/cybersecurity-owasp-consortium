@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { CYBERPULSE } from '../../cyberpulse.config';
 import PaymentBlock from './PaymentBlock';
 import SuccessCard from './SuccessCard';
@@ -39,7 +39,7 @@ function validateSolo(f) {
   return validatePerson(f, '');
 }
 
-function validateCombo(members, teamName) {
+function validateCombo(members) {
   let errs = {};
   members.forEach((m, i) => {
     const prefix = `m${i}_`;
@@ -114,7 +114,6 @@ export default function OutsideForm({ onClose }) {
     { name: '', email: '', phone: '', college: '', branch: '' },
     { name: '', email: '', phone: '', college: '', branch: '' },
   ]);
-  const [teamName, setTeamName] = useState('');
   const [screenshot, setScreenshot] = useState(null);
   const [utr, setUtr] = useState('');
   const [errors, setErrors] = useState({});
@@ -147,12 +146,9 @@ export default function OutsideForm({ onClose }) {
     if (tab === 'solo') {
       errs = validateSolo(soloFields);
     } else {
-      errs = validateCombo(members, teamName);
+      errs = validateCombo(members);
     }
 
-    if (tab !== 'solo' ? !screenshot : !screenshot) {
-      // screenshot required for both
-    }
     if (!screenshot) errs.screenshot = 'Payment screenshot is required.';
 
     setErrors(errs);
@@ -174,8 +170,10 @@ export default function OutsideForm({ onClose }) {
         });
       }
 
-      
-      const payload = {
+      // Generate unique registration ID
+      const id = 'CP-2026-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+      const basePayload = {
         regId: id,
         type: 'outside',
         isManit: false,
@@ -183,12 +181,26 @@ export default function OutsideForm({ onClose }) {
         paymentImageBase64: screenshotB64,
         paymentImageMime: screenshot.file?.type || 'image/png',
         plan: tab,
-        ...(tab === 'solo' ? soloFields : { members, teamName }),
         utr,
-        screenshotB64,
         _hp: '',
         submittedAt: new Date().toISOString(),
       };
+
+      const payload = tab === 'solo' 
+        ? {
+            ...basePayload,
+            name: soloFields.name,
+            email: soloFields.email,
+            phone: soloFields.phone,
+            scholar: 'N/A',
+            college: soloFields.college,
+            year: '',
+            branch: soloFields.branch,
+          }
+        : {
+            ...basePayload,
+            members: members.map(m => ({ ...m, scholar: 'N/A' })),
+          };
 
       const endpoint = CYBERPULSE.registration.endpoint;
       if (!endpoint) {
@@ -204,7 +216,6 @@ export default function OutsideForm({ onClose }) {
         if (result.status === 'error') throw new Error('Google Script Error: ' + result.message);
       }
 
-      
       setRegId(id);
       setStatus('success');
     } catch (err) {
@@ -298,9 +309,7 @@ export default function OutsideForm({ onClose }) {
       ) : (
         // ── COMBO FIELDS ─────────────────────────────────────
         <div>
-          <Field label="Team Name (Optional)" error={''}>
-            <input type="text" value={teamName} onChange={e => setTeamName(e.target.value)} placeholder="e.g. Team Cipher" />
-          </Field>
+
           <div style={{ marginTop: '1.5rem' }}>
             {members.map((m, i) => (
               <PersonForm
