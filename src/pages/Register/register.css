@@ -156,6 +156,7 @@
   padding: 1px;
   background: linear-gradient(135deg, rgba(255,26,26,.4), rgba(255,255,255,.08), rgba(255,26,26,.2));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
@@ -504,21 +505,22 @@
 
 .cp-payment-card {
   display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 1.2rem;
-  padding: 1.2rem;
+  grid-template-columns: 200px 1fr;
+  gap: 1.4rem;
+  padding: 1.4rem;
   border: 1px solid rgba(255,26,26,.18);
   border-radius: 8px;
   background: rgba(255,26,26,.03);
   margin-bottom: 1rem;
   align-items: start;
 }
-@media (max-width: 440px) { .cp-payment-card { grid-template-columns: 1fr; } }
+@media (max-width: 540px) { .cp-payment-card { grid-template-columns: 1fr; } }
 
 .cp-qr-img, .cp-qr-fallback {
-  width: 130px; height: 130px; border-radius: 6px;
+  width: 200px; height: 200px; border-radius: 8px;
   display: block; object-fit: cover;
-  border: 1px solid rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 0 0 4px rgba(255,26,26,.08);
 }
 .cp-qr-fallback {
   background: rgba(255,255,255,.04);

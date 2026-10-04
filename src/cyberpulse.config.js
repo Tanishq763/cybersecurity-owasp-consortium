@@ -1,6 +1,7 @@
 // ============================================================
 // CYBERPULSE EVENT CONFIG — fill in every "TBA" before going live
 // ============================================================
+import qrCodeImg from './assets/qr_code.jpeg';
 export const CYBERPULSE = {
   // ── Basic event info ────────────────────────────────────────
   name: 'CYBERPULSE',
@@ -25,7 +26,7 @@ export const CYBERPULSE = {
   payment: {
     upiId: 'TBA@upi',
     payeeName: 'OWASP MANIT',
-    qrImage: '/qr code.jpeg',    // path relative to public/
+    qrImage: qrCodeImg,             // imported from src/assets/qr_code.jpeg
     verificationNote: 'Payment is verified manually. You will receive a confirmation on email/WhatsApp within 24 hours.',
   },
 
