@@ -108,12 +108,76 @@ h3 { font: 600 1.15rem/1.2 var(--hd); }
 .nav.hide { opacity: 0; transform: translateY(-160%); pointer-events: none; }
 .mark { font: 800 1.1rem var(--hd); text-decoration: none; letter-spacing: .1em; }
 .mark img { height: 34px; display: block; }
-.nav .nav-links { display: flex; align-items: center; gap: 1.7rem; font: .78rem var(--mono); letter-spacing: .14em; text-transform: uppercase; }
-.nav .nav-links > a:not(.reg) { text-decoration: none; color: #ddd; padding: .3rem 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
-.nav .nav-links a.active { border-color: #fff; color: #fff; }
-.nav .nav-links .sep { border-left: 1px solid var(--line); padding-left: 1.7rem; margin-left: -.4rem; }
-.reg { background: #fff; color: #000; padding: .8rem 1rem; text-decoration: none; font-weight: 600; border-radius: 3px; transition: background .2s, color .2s; }
+/* Desktop nav-links container */
+.nav-links { display: flex; align-items: center; gap: 1.7rem; font: .78rem var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+.nav-links > a { text-decoration: none; color: #ddd; padding: .3rem 0; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; }
+.nav-links > a:not(.reg):hover, .nav-links > a:not(.reg).active { border-bottom-color: #fff; color: #fff; }
+
+/* Mobile nav: hidden by default, shown only when .open */
+.nav nav {
+  display: none;
+  position: absolute; top: calc(100% + .5rem); left: 0; right: 0;
+  background: rgba(6,6,6,.98);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  z-index: 60;
+}
+.nav nav.open { display: block; animation: nav-slide .22s ease; }
+@keyframes nav-slide { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform:none; } }
+
+/* Mobile link list */
+.nav-links-mobile { display: flex; flex-direction: column; padding: .75rem 0; }
+.nav-links-mobile > a {
+  padding: .9rem 1.5rem;
+  font: 600 .82rem var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #bbb;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color .2s, border-color .2s, background .2s;
+  display: block;
+}
+.nav-links-mobile > a:hover, .nav-links-mobile > a.active {
+  color: #fff; border-left-color: var(--red);
+  background: rgba(255,26,26,.05);
+}
+.mobile-reg { background: rgba(255,26,26,.12) !important; color: var(--red) !important; border-left-color: var(--red) !important; }
+
+/* Social icons in mobile menu */
+.nav-links-sep { height: 1px; background: rgba(255,255,255,.08); margin: .35rem 1.5rem; display: none; }
+.nav-socials-row { display: none; }
+
+/* ===== QR SPOTLIGHT ===== */
+.qr-spotlight {
+  text-align: center;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  max-width: 340px;
+  background: rgba(255,26,26,.04);
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+}
+.qr-wrap {
+  width: 220px; height: 220px;
+  border: 2px solid rgba(255,255,255,.2);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+.qr-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.qr-spotlight p { color: #ccc; font-size: .9rem; }
+.qr-spotlight strong { color: var(--red); }
+
+/* REGISTER button (desktop pill) */
+.reg { background: #fff; color: #000; padding: .65rem 1.1rem; text-decoration: none; font-weight: 700; border-radius: 4px; font-size: .75rem; letter-spacing: .12em; transition: background .2s, color .2s; white-space: nowrap; }
 .reg:hover { background: var(--red); color: #fff; }
+
 /* Burger — animated 3-line to X */
 .burger {
   display: none; background: none; border: 0; padding: .4rem;
@@ -174,7 +238,7 @@ body.scrolled .rail { opacity: 1; pointer-events: auto; transform: translateX(0)
   position: fixed; inset: 0; background: #000; z-index: 999;
   display: grid; place-items: center; color: #0f0; font-family: var(--mono);
   pointer-events: none; transform: translateY(-100%);
-  transition: transform .5s cubic-bezier(0.77, 0, 0.175, 1);
+  transition: transform .28s cubic-bezier(0.77, 0, 0.175, 1);
 }
 .twipe.active {
   transform: translateY(0);
@@ -589,43 +653,11 @@ input:focus, textarea:focus { border-color: rgba(255,255,255,.5); outline: none;
   .rt { text-align: left; }
   .rt p { margin-left: 0; }
   .rail { display: none; }
+  /* Show burger, hide desktop links */
   .burger { display: flex; }
-  .nav nav {
-    display: none;
-    position: absolute; top: calc(100% + .5rem); left: 0; right: 0;
-    flex-direction: column;
-    background: rgba(6,6,6,.98);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,.7);
-  }
-  .nav nav.open { display: flex; animation: nav-slide .25s ease; }
-  @keyframes nav-slide { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform:none; } }
-  .nav-links {
-    display: flex; flex-direction: column; padding: .75rem 0;
-  }
-  .nav-links a {
-    padding: .9rem 1.5rem;
-    font: 600 .82rem var(--mono);
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: #bbb;
-    text-decoration: none;
-    border-left: 2px solid transparent;
-    transition: color .2s, border-color .2s, background .2s;
-  }
-  .nav-links a:hover, .nav-links a.active {
-    color: #fff; border-left-color: var(--red);
-    background: rgba(255,26,26,.05);
-  }
-  /* thin separator before social icons */
-  .nav-links-sep {
-    height: 1px;
-    background: rgba(255,255,255,.08);
-    margin: .35rem 1.5rem;
-  }
-  /* social icons row — horizontal, side by side */
+  .nav-links { display: none; }   /* hide desktop row on mobile */
+  /* Show mobile social icons */
+  .nav-links-sep { display: block; }
   .nav-socials-row {
     display: flex;
     flex-direction: row;
@@ -642,8 +674,6 @@ input:focus, textarea:focus { border-color: rgba(255,255,255,.5); outline: none;
   }
   .nav-socials-row a:hover { color: var(--red); background: rgba(255,26,26,.08); }
   .nav-socials-row svg { width: 18px; height: 18px; pointer-events: none; }
-  /* hide desktop reg button */
-  .nav .nav-links > a.reg { display: none; }
   .scroll { display: none; }
   .wbody { padding: 1.5rem 1.4rem; }
   .tools input, .phd input { width: 100%; }
