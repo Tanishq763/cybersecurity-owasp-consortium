@@ -60,6 +60,9 @@ h3 { font: 600 1.15rem/1.2 var(--hd); }
 .btn.red { background: var(--red); border-color: var(--red); }
 .btn.red:hover { background: #fff; color: #000; border-color: #fff; }
 .btn.red::before { display: none; }
+.btn.green { background: #25D366; border-color: #25D366; color: #fff; }
+.btn.green:hover { background: #fff; color: #000; border-color: #fff; }
+.btn.green::before { display: none; }
 :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
 /* ===== PLACEHOLDER IMAGE ===== */
