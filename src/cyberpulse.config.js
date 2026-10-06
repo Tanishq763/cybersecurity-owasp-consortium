@@ -33,7 +33,7 @@ export const CYBERPULSE = {
   // ── Registration ────────────────────────────────────────────
   registration: {
     endpoint: 'https://script.google.com/macros/s/AKfycbzMko1fNXMNcq6ONEKS0C890D-02h6wDRFMUU33s1V_qQxtqD5ON9Ef51fNTBhZQVYkag/exec',
-    allowedManitDomains: [],
+    allowedManitDomains: ['@stu.manit.ac.in'],
     scholarPattern: /^\d{9,12}$/,  // adjust digits as needed
     yearOptions: ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Other'],
     branchOptions: ['CSE', 'ECE', 'EE', 'ME', 'CE', 'MCA', 'MBA', 'Other'],

@@ -18,6 +18,14 @@ function validate(fields) {
   if (!fields.name?.trim()) errs.name = 'Full name is required.';
   if (!fields.email?.trim() || !/^\S+@\S+\.\S+$/.test(fields.email)) {
     errs.email = 'Valid email is required.';
+  } else {
+    const domains = CYBERPULSE.registration.allowedManitDomains || [];
+    if (domains.length > 0) {
+      const emailDomain = fields.email.substring(fields.email.lastIndexOf('@')).toLowerCase();
+      if (!domains.some(d => emailDomain === d.toLowerCase())) {
+        errs.email = `Must use a college email (${domains.join(', ')}).`;
+      }
+    }
   }
   
   if (!fields.phone?.trim()) {
@@ -32,6 +40,11 @@ function validate(fields) {
     errs.scholar = 'Scholar number is required.';
   } else if (pat && !pat.test(fields.scholar.trim())) {
     errs.scholar = 'Invalid scholar number format.';
+  } else if (!errs.email && fields.email) {
+    const emailPrefix = fields.email.substring(0, fields.email.indexOf('@')).toLowerCase();
+    if (emailPrefix !== fields.scholar.trim().toLowerCase()) {
+      errs.scholar = 'Scholar number must match the email prefix.';
+    }
   }
   
   if (!fields.year) errs.year = 'Please select your year.';
@@ -159,7 +172,7 @@ export default function ManitForm({ onClose }) {
       <Field
         label="Email Address"
         required
-        hint="You can use any valid email"
+        hint={CYBERPULSE.registration.allowedManitDomains?.length > 0 ? `Must end with ${CYBERPULSE.registration.allowedManitDomains.join(', ')}` : "You can use any valid email"}
         error={errors.email}
       >
         <input
