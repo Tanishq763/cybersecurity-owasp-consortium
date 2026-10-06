@@ -41,7 +41,7 @@ export const CYBERPULSE = {
 
   // ── Links ────────────────────────────────────────────────────
   links: {
-    whatsapp: '',  // e.g. 'https://chat.whatsapp.com/XXXXXX'
+    whatsapp: 'https://chat.whatsapp.com/DMKgdk9PjOt7JyM1iOlrnK',  // e.g. 'https://chat.whatsapp.com/XXXXXX'
   },
 
   // ── Contact ─────────────────────────────────────────────────

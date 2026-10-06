@@ -65,7 +65,7 @@ export default function SuccessCard({ regId, name, email, isManit, plan, onClose
       <div className="cp-success-actions">
         <a href={icsUrl} download={`${regId}.ics`} className="btn">ADD TO CALENDAR</a>
         {CYBERPULSE.links.whatsapp && (
-          <a href={CYBERPULSE.links.whatsapp} target="_blank" rel="noreferrer" className="btn red">JOIN WHATSAPP ↗</a>
+          <a href={CYBERPULSE.links.whatsapp} target="_blank" rel="noreferrer" className="btn green">JOIN WHATSAPP ↗</a>
         )}
         <button className="btn" onClick={onClose}>CLOSE</button>
       </div>
