@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { CYBERPULSE } from '../../cyberpulse.config';
 import SuccessCard from './SuccessCard';
 
@@ -58,6 +58,7 @@ export default function ManitForm({ onClose }) {
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [errMsg, setErrMsg] = useState('');
   const [regId, setRegId] = useState('');
+  const submittingRef = useRef(false);
 
   const set = (k, v) => {
     setFields(f => ({ ...f, [k]: v }));
@@ -71,6 +72,7 @@ export default function ManitForm({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submittingRef.current) return;
     const errs = validate(fields);
     setErrors(errs);
     if (Object.keys(errs).length) {
@@ -81,6 +83,7 @@ export default function ManitForm({ onClose }) {
       return;
     }
 
+    submittingRef.current = true;
     setStatus('loading');
     try {
       const id = 'CP-2026-' + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -89,7 +92,7 @@ export default function ManitForm({ onClose }) {
         type: 'manit',
         name: fields.name,
         email: fields.email,
-        phone: fields.phone,
+        phone: fields.phone.replace(/\D/g, '').slice(-10),
         scholar: fields.scholar,
         college: 'MANIT',
         year: fields.year,
@@ -116,6 +119,7 @@ export default function ManitForm({ onClose }) {
       setRegId(id);
       setStatus('success');
     } catch (err) {
+      submittingRef.current = false;
       setStatus('error');
       setErrMsg(err.message || 'Something went wrong. Please try again.');
     }

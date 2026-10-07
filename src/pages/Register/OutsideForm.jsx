@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { CYBERPULSE } from '../../cyberpulse.config';
 import PaymentBlock from './PaymentBlock';
 import SuccessCard from './SuccessCard';
@@ -120,6 +120,7 @@ export default function OutsideForm({ onClose }) {
   const [status, setStatus] = useState('idle');
   const [errMsg, setErrMsg] = useState('');
   const [regId, setRegId] = useState('');
+  const submittingRef = useRef(false);
 
   const price = tab === 'solo' ? CYBERPULSE.fees.solo : CYBERPULSE.fees.combo;
 
@@ -140,6 +141,7 @@ export default function OutsideForm({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submittingRef.current) return;
 
     // Validate
     let errs = {};
@@ -157,6 +159,7 @@ export default function OutsideForm({ onClose }) {
       return;
     }
 
+    submittingRef.current = true;
     setStatus('loading');
     try {
       // Compress screenshot to base64
@@ -191,7 +194,7 @@ export default function OutsideForm({ onClose }) {
             ...basePayload,
             name: soloFields.name,
             email: soloFields.email,
-            phone: soloFields.phone,
+            phone: soloFields.phone.replace(/\D/g, '').slice(-10),
             scholar: 'N/A',
             college: soloFields.college,
             year: '',
@@ -199,7 +202,7 @@ export default function OutsideForm({ onClose }) {
           }
         : {
             ...basePayload,
-            members: members.map(m => ({ ...m, scholar: 'N/A' })),
+            members: members.map(m => ({ ...m, scholar: 'N/A', phone: m.phone.replace(/\D/g, '').slice(-10) })),
           };
 
       const endpoint = CYBERPULSE.registration.endpoint;
@@ -219,6 +222,7 @@ export default function OutsideForm({ onClose }) {
       setRegId(id);
       setStatus('success');
     } catch (err) {
+      submittingRef.current = false;
       setStatus('error');
       setErrMsg(err.message);
     }
